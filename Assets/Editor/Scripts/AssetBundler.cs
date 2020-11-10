@@ -244,7 +244,20 @@ public class AssetBundler
             .Select(path => "Assets/Plugins/Managed/" + Path.GetFileNameWithoutExtension(path))
             .ToList();
 
-        managedReferences.Add(Path.Combine(EditorApplication.applicationContentsPath, "Managed/UnityEngine"));
+        string unityAssembliesLocation;
+        switch (Application.platform)
+        {
+            case RuntimePlatform.OSXEditor:
+                unityAssembliesLocation = EditorApplication.applicationPath + "/Contents/Managed/";
+                break;
+            case RuntimePlatform.LinuxEditor:
+            case RuntimePlatform.WindowsEditor:
+            default:
+                unityAssembliesLocation = Path.Combine(Path.GetDirectoryName(EditorApplication.applicationPath), @"Data/Managed/");
+                break;
+        }
+
+        managedReferences.Add(unityAssembliesLocation + "UnityEngine");
 
         //Next we need to grab some type references and use reflection to build things the way Unity does.
         //Note that EditorUtility.CompileCSharp will do *almost* exactly the same thing, but it unfortunately
